@@ -1,0 +1,72 @@
+
+
+TODO:
+
+- add session_stats & lifetime_stats & way to reset session
+
+- change settings to fx_vol, music_vol, sensitivity
+
+- hookup settigns to audio, etc...
+
+
+NOTES:
+- resume... easy
+- restart... need a wayt to reset level stats & level
+- quit.... reset level stats, reset session stats
+- level init....
+	- draw geometry: walls & bgs
+	- add hero
+	- init objects
+		- Random or placed
+			- blocks, foods, inerts, enemies
+	- spawns....
+		- at tocks
+		- random chance per second
+		- at hero pos
+
+- game types:
+	- surgery... walls kill, one or two foods, maze-like, countdown clock
+	- clear.... eat all foods to clear level, countUp clock, time & collision bonuses
+	- survive.... eat until you die... spawning increases over time
+
+- space-cow
+- octopus
+- microbes
+
+
+for each theme......
+- background
+- hero sprite
+- blue square
+- red square
+- green square
+- blue circle
+- red circle
+- green circle
+- red triangl
+- green triangle
+
+
+
+DONE:
+
+
+- dynamic spawning objects on tock listener or specific time
+
+- refactor level definitions
+	- turn into actual modules
+	- or... make a level module to read level definitions
+
+- add tock (was enterFrame) functions to level modules
+	- call them in game enterframe... pass in food_count, enemy_count & clock seconds elapsed
+	- use to spawn things
+
+- settigns screen
+- pause & pause overlay
+- hookup pause-restart
+- add target collisions to hud
+- level summary & advance
+- game.countin
+- use texture/tiling for BG -- remove Tile Engine
+
+- different textures for inside & outside arena

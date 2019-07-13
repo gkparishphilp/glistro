@@ -22,8 +22,8 @@ M.wallWidth = 10
 M.wallFill = { type="image", filename='assets/textures/wood.jpg' }
 
 M.arena_bg 	= {
-	fill 		= { type="image", filename='assets/textures/space1.jpg' },
-	tx_size = 512,
+	fill 		= { type="image", filename='assets/textures/pale_water.jpg' },
+	tx_size = 256,
 	tx_scale = 1,
 }
 
@@ -39,22 +39,34 @@ M.heroY 	= M.h / 2
 
 M.spawns = {}
 M.spawns['0'] = {
-	{ count=5, shape='square', type='inert' },
-	{ count=5, shape='square', type='food' },
+	--{ count=3, species='block', type='inert', scaleFactor=0.33 },
 
-	-- { count=3, shape='circle', type='food' },
-	-- { count=3, shape='circle', type='inert' },
-	--{ shape='square', type='enemy', x=device.centerX, y=device.centerY-100, w=300, h=10 },
-	--{ shape='square', type='enemy', x=device.centerX, y=device.centerY+100, w=300, h=10 },
+	--{ count=3, species='block', type='food', scaleFactor=0.25 },
+
+	--{ count=2, species='block', type='enemy', scaleFactor=0.25 },
+
+	{ count=3, species='floater', type='food', scaleFactor=0.15 },
+
+	{ count=3, species='floater', type='inert' },
+
+	{ count=2, species='floater', type='enemy' },
+
+	{ count=5, species='wanderer', type='inert', scaleFactor=0.35 },
+
+	{ count=10, species='wanderer', type='food', scaleFactor=0.33 },
+
+	{ species='follower', type='enemy', x=100, y=100, scaleFactor=0.5, speed=5 },
 }
 
--- M.spawns['10'] = {
--- 	{ count=5, shape='square', type='inert' },
--- }
+M.spawns['10'] = {
+	{ count=5, species='wanderer', type='inert' },
+}
+M.spawns['20'] = {
+	{ count=5, species='wanderer', type='inert' },
+}
 
--- M.spawns['20'] = {
--- 	{ count=5, shape='square', type='inert' },
--- }
-
+M.spawns['30'] = {
+	{ count=5, species='wanderer', type='inert' },
+}
 
 return M

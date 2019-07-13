@@ -16,11 +16,11 @@ print("-----------------------------------")
 -- Seed the random number generator
 math.randomseed( os.time() )
 
-print( "gData Table:")
-debugger.print_table( gdata )
+-- print( "gData Table:")
+-- debugger.print_table( gdata )
 
-print( "Device Table:")
-debugger.print_table( device )
+-- print( "Device Table:")
+-- debugger.print_table( device )
 
 
 -- hide the status bar
@@ -32,7 +32,7 @@ local settings = require( 'modules.settings' )
 -- initialize users settings
 local saved_settings = FileUtils.loadTable( "settings.json" )
 
-debugger.print_table( saved_settings )
+--debugger.print_table( saved_settings )
 
 -- have to initialize settings in case file doesn't exist
 -- fill in any missing args from module defaults

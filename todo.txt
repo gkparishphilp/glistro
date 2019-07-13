@@ -9,7 +9,39 @@ TODO:
 - hookup settigns to audio, etc...
 
 
+
+
 NOTES:
+
+
+Change classes to reflect behaviors. Each will use sprite/physics, and can default to a shape.
+All but hero can be type: enemy/food/inert
+- Hero
+	- moves via touch
+- Block
+	- stationary... image is texture/fill
+- Floater
+	- just a dynamic... bounces around
+- Follower
+	- follows/flees based on type:  enemy/food
+- Random?
+	- shoots off in a random direction sometimes
+
+Assets named as type_species:
+- inert_block
+- inert_floater
+- inert_wanderer
+- food_block
+- food_floater
+- food_wanderer
+- food_follower
+- enemy_block
+- enemy_floater
+- enemy_follower
+- enemy_wanderer
+
+
+
 - resume... easy
 - restart... need a wayt to reset level stats & level
 - quit.... reset level stats, reset session stats

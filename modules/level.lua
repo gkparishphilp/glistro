@@ -5,10 +5,12 @@ local mFloor = math.floor
 local mSqrt = math.sqrt
 
 local Hero = require( 'modules.hero' )
-local Circle = require( 'modules.circle' )
-local Square = require( 'modules.square' )
-local Triangle = require( 'modules.triangle' )
-local Diamond = require( 'modules.diamond' )
+local Block = require( 'modules.block' )
+local Floater = require( 'modules.floater' )
+local Follower = require( 'modules.follower' )
+local Wall = require( 'modules.wall' )
+local Wanderer = require( 'modules.wanderer' )
+local Powerup = require( 'modules.powerup' )
 
 
 local physics = require( 'physics' )
@@ -34,7 +36,6 @@ M.defaults = {
 }
 
 
-
 function M:new( args )
 	
 	-- fill in any missing args from module defaults
@@ -53,7 +54,6 @@ function M:new( args )
 		-- args.type == food, inert, enemy 
 		-- args.shape == square, circle, triangle
 		-- x, y, w, h, speed, freq, spawnDur
-		print( 'adding... ' .. args.shape )
 
 		local params = {}
 		params[1] = {}
@@ -70,10 +70,10 @@ function M:new( args )
 			-- hopefully new randaom values per count if more than one....
 			if i > 1 then params[i] = {} end
 			params[i].w = params[i].w or mRand( 5, 22 )
-			if args.shape == 'circle' then params[i].w = params[i].w / 2 end
+			if args.species == 'circle' then params[i].w = params[i].w / 2 end
 			params[i].h = params[i].h or params[i].w
 			if params[i].x == nil then
-				print( 'generating rand xy pos.... ')
+				--print( 'generating rand xy pos.... ')
 				repeat
 					params[i].x = mRand( params[i].w/2, self.w-(params[i].w/2) )
 					params[i].y = mRand( params[i].h/2, self.h-(params[i].h/2) )
@@ -85,12 +85,16 @@ function M:new( args )
 			-- actually add the objects
 			-- note that shape, type, freq, speed are set by parent args,
 			-- while size & xy are initialized above....
-			if args.shape == 'square' then 
-				self.objects[#self.objects + 1] = Square:new({ parent=self, type=args.type, x=params[k].x, y=params[k].y, width=params[k].w, height=params[k].h, spawnDur=args.spawnDur, freq=args.freq, speed=args.speed })
-			elseif args.shape == 'circle' then
-				self.objects[#self.objects + 1] = Circle:new({ parent=self, type=args.type, x=params[k].x, y=params[k].y, size=params[k].w, spawnDur=args.spawnDur, freq=args.freq, speed=args.speed })
-			elseif args.shape == 'triangle' then
-				self.objects[#self.objects + 1] = Triangle:new({ parent=self, type=args.type, x=params[k].x, y=params[k].y, size=params[k].w, spawnDur=args.spawnDur, freq=args.freq, speed=args.speed })
+			if args.species == 'block' then 
+				self.objects[#self.objects + 1] = Block:new({ parent=self, type=args.type, x=params[k].x, y=params[k].y, width=params[k].w, height=params[k].h, spawnDur=args.spawnDur, freq=args.freq, speed=args.speed, scaleFactor=args.scaleFactor })
+			elseif args.species == 'floater' then
+				self.objects[#self.objects + 1] = Floater:new({ parent=self, type=args.type, x=params[k].x, y=params[k].y, size=params[k].w, spawnDur=args.spawnDur, freq=args.freq, speed=args.speed })
+			elseif args.species == 'follower' then
+				self.objects[#self.objects + 1] = Follower:new({ parent=self, type=args.type, x=params[k].x, y=params[k].y, scaleFactor=args.scaleFactor, spawnDur=args.spawnDur, freq=args.freq, speed=args.speed })
+			elseif args.species == 'wall' then
+				self.objects[#self.objects + 1] = Wall:new({ parent=self, type=args.type, x=params[k].x, y=params[k].y, w=params[k].w, h=params[k].h, spawnDur=args.spawnDur, texture=args.texture })
+			elseif args.species == 'wanderer' then
+				self.objects[#self.objects + 1] = Wanderer:new({ parent=self, type=args.type, x=params[k].x, y=params[k].y, size=params[k].w, spawnDur=args.spawnDur, freq=args.freq, speed=args.speed, scaleFactor=args.scaleFactor })
 			end
 		end
 
@@ -110,24 +114,28 @@ function M:new( args )
 
 		self.music = self.data.music
 
+		self.char_sheet_info = require( "assets.characters." .. 'micro' .. ".char_sheet" )
+		self.char_sheet = graphics.newImageSheet( "assets/characters/" .. 'micro' .. "/char_sheet.png", self.char_sheet_info:getSheet() )
+
 		self:draw_geometry()
+
+		-- update viewport to center-track the hero
+		self.x = device.centerX - self.data.heroX
+		self.y = device.centerY - self.data.heroY + self.parent.hud.h / 2
+
 
 		self.hero = Hero:new({ 
 			parent		= level,
 			x 			= self.data.heroX,
 			y 			= self.data.heroY,
+			scaleFactor = 0.75
 		})
 
 		gd.level_stats.target_collisions = self.data.target_collisions
 		gd.level_stats.target_time = self.data.target_time
 
-		print( "setting up '0' spawns" )
-
 		if self.data.spawns['0'] then
-			print( 'got setup spawns')
-			print( 'thare are ' .. #self.data.spawns['0'] .. ' row' )
 			for i=1, #self.data.spawns['0'] do
-				debug.print_table( self.data.spawns['0'][i] )
 				level:add( self.data.spawns['0'][i] )
 			end
 		end
@@ -154,41 +162,23 @@ function M:new( args )
 		self.arena_bg.fill.scaleX = self.data.arena_bg.tx_size / self.arena_bg.contentWidth * self.data.arena_bg.tx_scale
 		self.arena_bg.fill.scaleY = self.data.arena_bg.tx_size / self.arena_bg.contentHeight * self.data.arena_bg.tx_scale
 
-		self.walls = {}
-		self.walls.top = display.newRect( self, self.data.w/2, 0, self.data.w, self.data.wallWidth )
-		self.walls.top.anchorX, self.walls.top.anchorY = 0.5, 1
-		physics.addBody( self.walls.top, 'static' )
-		self.walls.top.type = 'inert'
-		self.walls.top.fill = self.data.wallFill
-
-		self.walls.bottom = display.newRect( self, self.data.w/2, self.data.h, self.data.w, self.data.wallWidth )
-		self.walls.bottom.anchorX, self.walls.bottom.anchorY = 0.5, 0
-		physics.addBody( self.walls.bottom, 'static' )
-		self.walls.bottom.type = 'inert'
-		self.walls.bottom.fill = self.data.wallFill
-
-		self.walls.left = display.newRect( self, 0, self.data.h/2, self.data.wallWidth, self.data.h + (2*self.data.wallWidth) )
-		self.walls.left.anchorX, self.walls.left.anchorY = 1, 0.5
-		physics.addBody( self.walls.left, 'static' )
-		self.walls.left.type = 'inert'
-		self.walls.left.fill = self.data.wallFill
-
-		self.walls.right = display.newRect( self, self.data.w, self.data.h/2, self.data.wallWidth, self.data.h + (2*self.data.wallWidth) )
-		self.walls.right.anchorX, self.walls.right.anchorY = 0, 0.5
-		physics.addBody( self.walls.right, 'static' )
-		self.walls.right.type = 'inert'
-		self.walls.right.fill = self.data.wallFill
+		-- top wall
+		self:add({ type='inert', species='wall', x=self.data.w/2, y=-self.data.wallWidth/2, w=self.data.w, h=self.data.wallWidth, texture=self.data.wallFill })
+		-- bottom wall
+		self:add({ type='inert', species='wall', x=self.data.w/2, y=self.data.h+self.data.wallWidth/2, w=self.data.w, h=self.data.wallWidth, texture=self.data.wallFill })
+		-- left wall
+		self:add({ type='inert', species='wall', x=-self.data.wallWidth/2, y=self.data.h/2, w=self.data.wallWidth, h=self.data.h + (2*self.data.wallWidth), texture=self.data.wallFill })
+		-- right wall
+		self:add({ type='inert', species='wall', x=self.data.w + self.data.wallWidth/2, y=self.data.h/2, w=self.data.wallWidth, h=self.data.h + (2*self.data.wallWidth), texture=self.data.wallFill })
 
 		
 	end
 
 	function level:tock( args )
-		print( 'Level is tocking....' .. args.secs )
+		--print( "Tock.... at " .. args.secs .. " secs, level.x = " .. self.x .. " level.y = " .. self.y )
 		if self.data.spawns[tostring( args.secs )] then
-			print( 'got tock spawns')
-			print( 'thare are ' .. #self.data.spawns[tostring( args.secs )] .. ' row' )
 			for i=1, #self.data.spawns[tostring( args.secs )] do
-				debug.print_table( self.data.spawns[tostring( args.secs )][i] )
+				--debug.print_table( self.data.spawns[tostring( args.secs )][i] )
 				level:add( self.data.spawns[tostring( args.secs )][i] )
 			end
 		end

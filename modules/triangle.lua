@@ -12,7 +12,7 @@ M.defaults = {
 	parent 	= display.newGroup(),
 	x 		= device.centerX/2,
 	y 		= device.centerY/2,
-	size 	= 20,
+	scale 	= 1,
 	type 	= 'enemy',
 	spawnDur = 4000,
 	
@@ -21,7 +21,9 @@ M.defaults = {
 }
 
 local function spawn( obj )
-	physics.addBody( obj, 'dynamic', { shape = obj.verts, density=1000 } )
+	obj.alpha = 1
+	local pd = require ( 'assets.characters.spacecow.enemy' ).physicsData( obj.scaleFactor )
+	physics.addBody( obj, 'dynamic', pd:get('enemy') )
 	obj.status = 'live'
 
 end
@@ -41,7 +43,15 @@ function M:new( args )
 	triangle.type = args.type
 	triangle.freq = args.freq
 	triangle.speed = args.speed
+
+	triangle.scaleFactor = args.scaleFactor
+
+	triangle.x = args.x
+	triangle.y = args.y
+
 	triangle.status = 'spawning'
+
+	triangle:scale( 0.01, 0.01 )
 	
 	if args.type == 'inert' then
 		triangle.fill = { 0, 0, 1, 1 }
@@ -67,7 +77,7 @@ function M:new( args )
 
 
 	--transition.to( mask, { time=args.spawnDur, xScale=1, yScale=1, onComplete=function() mask:removeSelf(); mask=nil; end } )
-	transition.to( triangle, { time=args.spawnDur, alpha=1, xScale=1, yScale=1, onComplete=function() spawn( triangle ); end } )
+	transition.to( triangle, { time=args.spawnDur, alpha=0.5, xScale=args.scaleFactor, yScale=args.scaleFactor, onComplete=function() spawn( triangle ); end } )
 
 
 	function triangle:eachFrame( args )
@@ -79,7 +89,7 @@ function M:new( args )
 		local dx = args.heroX - self.x
 		local dy = args.heroY - self.y
 		local angle = atan2( dy, dx )
-		angle = angle * ( 180 / pi )
+		angle = angle * ( 180 / pi ) - 45
 
 		if self.type == 'food' then
 			angle = angle + 180

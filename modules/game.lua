@@ -76,7 +76,7 @@ function M:new( args )
 
 	function game.collision( e )
 		if e.phase == 'began' then
-			print( 'hit a ' .. e.other.type )
+			print( 'hit ' .. e.other.type .. ' ' .. e.other.species )
 			if e.other.type == 'food' then
 				if e.other.status ~= 'dead' then
 					---print( 'ate a food' )
@@ -160,12 +160,15 @@ function M:new( args )
 			-- update viewport to cebter-track the hero
 			if game.level.w > device.actualContentWidth then
 				game.level.x = device.centerX - game.level.hero.x
+				if game.level.x < game.minViewX then game.level.x = game.minViewX end
+				if game.level.x > game.maxViewX then game.level.x = game.maxViewX end
 			end
 
 			if game.level.h > device.actualContentHeight then
-				game.level.y = device.centerY - game.level.hero.y
+				game.level.y = device.centerY - game.level.hero.y + self.hud.h / 2
+				if game.level.y < game.minViewY then game.level.y = game.minViewY end
+				if game.level.y > game.maxViewY then game.level.y = game.maxViewY end
 			end
-
 			
 
 			
@@ -218,14 +221,14 @@ function M:new( args )
 		gd.reset_level_stats()
 
 		self.level:setup()
-		
-		-- center the viewport
-		self.level.x = device.centerX - self.level.hero.x
-		self.level.y = device.centerY - self.level.hero.y
 
-		-- shift entire geometry down to accomodate hud contentHeight
-		-- only really required if level height < screenHeight
-		self.level.y = self.level.y + self.hud.h / 2
+		self.minViewX = self.level.x - (self.level.w / 2 ) + ( device.actualContentWidth / 4 ) + 80
+		self.maxViewX = self.level.x + ( self.level.w / 2 )  - ( device.actualContentWidth / 4 ) - 80
+		--print( "minViewX=" .. self.minViewX .. " maxViewX=" .. self.maxViewX )
+
+		self.minViewY = self.level.y - (self.level.h / 2 ) + ( device.actualContentHeight / 4 ) 
+		self.maxViewY= self.level.y + ( self.level.h / 2 )  - ( device.actualContentHeight / 4 ) - self.hud.h /2
+		--print( "minViewY=" .. self.minViewY .. " maxViewY=" .. self.maxViewY )
 
 		Sound.playMusic( Sound.music[game.level.music] )
 

@@ -10,9 +10,19 @@ M.defaults = {
 	parent 	= display.newGroup(),
 	x 		= device.centerX,
 	y 		= device.centerY,
-	size 	= 24,
+	scaleFactor 	= 1,
+	spawnDur 		= 2000
 	
 }
+
+
+local function spawn( obj )
+	local pd = require ( "assets.characters." .. 'micro' .. ".physics_defs" ).physicsData( obj.scaleFactor/2 )
+	physics.addBody( obj, 'dynamic', pd:get('hero') )
+	obj.angularDamping = 100
+end
+
+
 
 function M:new( args )
 	
@@ -22,17 +32,18 @@ function M:new( args )
 		args[key] = args[key] or M.defaults[key]
 	end
 
-	local hero = display.newCircle( args.parent, args.x, args.y, args.size )
-	
-	hero.fill = { 1, 1, 0, 1 }
-
+	--local hero = display.newImageRect( args.parent, 'assets/characters/spacecow/hero.png', 128, 128 )
+	local hero = display.newImage( args.parent, args.parent.char_sheet, args.parent.char_sheet_info:getFrameIndex( 'hero' ) )
+	hero.x = args.x
+	hero.y = args.y
 	hero.name = 'hero'
+	hero.scaleFactor = args.scaleFactor
 
-	display.setDefault( "textureWrapX", "repeat" )
-	display.setDefault( "textureWrapY", "repeat" )
-	hero.fill = { type="image", filename='assets/characters/spacecow/hero.png' }
+	hero:scale( 0.01, 0.01 )
 
-	physics.addBody( hero, 'dynamic', { radius=args.size*0.66, density=10, bounce=0.001 } )
+
+	transition.to( hero, { time=args.spawnDur, alpha=1, xScale=args.scaleFactor, yScale=args.scaleFactor, onComplete=function() spawn( hero ); end } )
+
 
 
 	function hero:cleanup()

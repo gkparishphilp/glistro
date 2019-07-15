@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- Main Menu
+-- Level Seummary
 --
 -----------------------------------------------------------------------------------------
 
@@ -17,8 +17,6 @@ local screenWidth = screenRight - screenLeft
 local screenHeight = screenBottom - screenTop
 
 local gd = require( 'modules.gdata' )
-local Sound = require( 'modules.sound' )
-local Clock = require( 'modules.clock' )
 
 local Composer = require( "composer" )
 local scene = Composer.newScene()
@@ -27,7 +25,6 @@ local scene = Composer.newScene()
 
 -- forward declarations and other locals
 local ui = {}
-local die_sound, levelup_sound
 
 function scene:create( event )
 	local group = self.view

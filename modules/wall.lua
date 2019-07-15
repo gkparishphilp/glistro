@@ -16,7 +16,7 @@ M.defaults = {
 }
 
 local function spawn( obj )
-	physics.addBody( obj, 'static', { bounce=1.05, friction=0, density=2 } )
+	physics.addBody( obj, 'static', { bounce=1.01, friction=0, density=2 } )
 end
 
 function M:new( args )

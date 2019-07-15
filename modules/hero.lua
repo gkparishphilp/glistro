@@ -20,6 +20,7 @@ local function spawn( obj )
 	local pd = require ( "assets.characters." .. 'micro' .. ".physics_defs" ).physicsData( obj.scaleFactor/2 )
 	physics.addBody( obj, 'dynamic', pd:get('hero') )
 	obj.angularDamping = 100
+	--obj.linearDamping = 0.1
 end
 
 

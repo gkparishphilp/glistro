@@ -7,6 +7,8 @@
 local gd = require( 'modules.gdata' )
 local device = require( 'utilities.device' )
 
+local Btn = require( 'ui.btn' )
+
 local Composer = require( "composer" )
 local scene = Composer.newScene()
 
@@ -32,21 +34,22 @@ function scene:create( event )
 		y 			= device.screenHeight * 0.15,
 	})
 
-	ui.back_btn = display.newText({
+	ui.settings_btn = Btn:new({
 		parent 		= group,
-		text 		= "Back",
-		font 		= 'assets/fonts/press_play.ttf',
-		fontSize 	= 14,
+		outline 	= 2,
+		outline_radius = 4,
+		outline_color = { 1, 1, 1, 0.5},
+		label 		= "Back",
 		x 			= 40,
-		y 			= device.screenHeight - 40,
+		y 			= device.screenHeight-60,
+		--width 		= 150,
+		--height 		= 40,
+		font 		= 'assets/fonts/press_play.ttf',
+		font_size 	= 14,
+		color 		= { 1, 1, 1 },
+		anchorX 	= 0,
+		onPress 	= function() Composer.gotoScene( 'scenes.main_menu' ); end,
 	})
-	ui.back_btn.anchorX = 0
-	function ui.back_btn:touch( e )
-		if e.phase == 'began' then
-			Composer.gotoScene( 'scenes.main_menu' )
-		end
-	end
-	ui.back_btn:addEventListener( 'touch', ui.back_btn )
 
 
 	

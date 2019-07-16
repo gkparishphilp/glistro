@@ -11,7 +11,7 @@
 
 -- Here are all available opts so far...
 
--- onRelease 		= function to call when button is pressed
+-- onPress 		= function to call when button is pressed
 -- x 				= x coordinate for btn group
 -- y 				= y coordinate for btn group
 -- anchorX 			= x anchor for btn group
@@ -22,29 +22,22 @@
 -- label_x 			= x coord for label txt (defaults to btn center)
 -- label_y 			= y coord for label txt (defaults to btn center)
 -- font 			= font to use for label
--- outline 			= border radius to draw outline container (0 for no container)
+-- outline 			= border width to draw outline container (0 for no outline, -1 for no container)
 -- outline_radius 	= corner radius for border (half height for circle)
--- icon 			= icon to include (font awesome)
--- icon_x  			= x coord for icon (defaults to btn center if no label, 33% left if label)
--- icon_y 			= y coord for icon (defaults to btn center)
 -- color 			= color (defaults to border, font & icon)
 -- press_color 		= color when button pressed 
--- bg_color 		= color of button bg (if border > 0)
--- press_bg_color 	= color of button bg (if border > 0)	
--- outline_color
--- press_outline_color
+-- bg_color 		= color of button bg (if border > -1)
+-- bg_press_color 	= color of button bg (if border > -1)
+-- outline_color 		= color of button outline (if border > 0)
+-- outline_press_color 	= color of button outline (if border > 0)	
+
 
 ---------------------------------------------------------------------------------
 -- "Globals"
 ---------------------------------------------------------------------------------
-local centerX = display.contentCenterX
-local centerY = display.contentCenterY
-local screenTop = display.screenOriginY
-local screenLeft = display.screenOriginX
-local screenBottom = display.screenOriginY + display.actualContentHeight
-local screenRight = display.screenOriginX + display.actualContentWidth
-local screenWidth = screenRight - screenLeft
-local screenHeight = screenBottom - screenTop
+local device = require 'utilities.device'
+local Debug = require( 'utilities.debug' )
+
 
 -- Table to hold everything
 local M = {}
@@ -52,23 +45,23 @@ local M = {}
 -- Default opts
 M.defaults = {
 	font 			= 'Helvetica',
-	x 				= centerX,
-	y 				= centerY,
+	font_size 		= 12,
+	x 				= device.centerX,
+	y 				= device.centerY,
 	anchorX 		= 0.5,
 	anchorY 		= 0.5,
-	width 			= 40,
-	height 			= 40,
 	outline 		= 2,
-	color 			= { 0.5, 0.5, 0.99, 1 },
-	press_color 	= { .88, .88, .88, 1 },
+	color 			= { 1, 1, 1, 1 },
+	press_color 	= { 0.88, 0.88, 0.88, 1 },
 	bg_color 		= { 0, 0, 0, 1 },
-	bg_press_color 	= { 0, 0, 0, 1 }
+	bg_press_color 	= { 0.15, 0.15, 0.15, 1 },
 
 }
 
 -- Create an instance
 function M:new( opts )
 	if opts == nil then opts = M.defaults end
+
 
 	-- passing in a theme sets font and colors by default (opts should over-ride)
 	local theme = nil
@@ -94,74 +87,68 @@ function M:new( opts )
 		opts.outline_press_color = opts.outline_press_color or theme.colors.btn_outline_press
 	end
 	
+
 	-- fill in any missing opts from module defaults
 	for key, value in pairs( M.defaults ) do
 		opts[key] = opts[key] or M.defaults[key]
 	end
-	opts.font_size = opts.font_size or opts.height / 3
+
+	-- print( "btn opts: " )
+	-- Debug.print_table( opts )
+	
+
+	local btn = display.newGroup()
+	btn.anchorChildren = true 
+	btn.anchorX = opts.anchorX
+	btn.anchorY = opts.anchorY
+	btn.x = opts.x
+	btn.y = opts.y
+
+	if opts.parent then
+		opts.parent:insert( btn )
+	end
 
 	-- can position the label or defaults to button center
 	opts.label_x = opts.label_x or opts.x
 	opts.label_y = opts.label_y or opts.y
 
-	-- can position icon, or defaults to button center if no label, left if label present
-	if opts.label then
-		opts.icon_x = opts.icon_x or opts.x - opts.width * 0.33
-	else	
-		opts.icon_x = opts.icon_x or opts.x
-	end
-	opts.icon_y = opts.icon_y or opts.y
-
-	-- can set icon size, or defaults to smaller if label, larger if no label
-	if opts.label then
-		opts.icon_size = opts.icon_size or opts.height / 3
-	else 
-		opts.icon_size = opts.icon_size or opts.height / 2
-	end
-
-	-- can set radius ( 0 for square, max of 1/2 height for perfectly round )
-	opts.outline_radius = opts.outline_radius or opts.height / 2
-
-
-	-- outline color defaults to primary color
-	opts.outline_color = opts.outline_color or opts.color 
-	opts.press_outline_color = opts.press_outline_color or opts.press_color 
-
-
-
-
-	local btn = display.newGroup()
-	if opts.parent then
-		opts.parent:insert( btn )
-	end
-
-	btn.anchorX, btn.anchorY = opts.anchorX, opts.anchorY
-
-	if opts.outline >= 0 then
-		btn.outline = display.newRoundedRect( btn, opts.x, opts.y, opts.width, opts.height, opts.outline_radius )
-		
-		if opts.outline > 0 then
-			btn.outline.stroke = {type="image", filename="assets/textures/brushes/blur_brush1x4.png"}
-			btn.outline.strokeWidth = opts.outline
-	
-			-- this can't be stroke= to get antialiased border
-			btn.outline:setStrokeColor( unpack(opts.outline_color ) )
-		end
-
-		btn.outline.fill = opts.bg_color
-	end
 
 	if opts.label then
 		btn.label = display.newText( btn, opts.label, opts.label_x, opts.label_y, opts.font, opts.font_size )
 		btn.label.fill =  opts.color
 	end
 
-	if opts.icon then
-		btn.icon = display.newText( btn, opts.icon, opts.icon_x, opts.icon_y, 'FontAwesome', opts.icon_size )
-		btn.icon.fill = opts.color
+	opts.width = opts.width or btn.label.contentWidth + opts.font_size*2
+	opts.height = opts.height or btn.label.contentHeight + opts.font_size*2
+
+
+	-- can set radius ( 0 for square, max of 1/2 height for perfectly round )
+	opts.outline_radius = opts.outline_radius or opts.height / 2
+
+
+	-- outline color defaults to primary color
+	opts.press_color = opts.press_color or opts.color
+	opts.outline_color = opts.outline_color or opts.color
+	opts.outline_press_color = opts.outline_press_color or opts.press_color
+	
+
+	if opts.outline >= 0 then
+		btn.outline = display.newRoundedRect( btn, opts.x, opts.y, opts.width, opts.height, opts.outline_radius )
+		
+		btn.outline.stroke = {type="image", filename="assets/textures/brushes/blur_brush1x4.png"}
+		btn.outline.strokeWidth = opts.outline
+
+		-- this can't be stroke= to get antialiased border
+		btn.outline:setStrokeColor( unpack(opts.outline_color ) )
+
+		btn.outline.fill = opts.bg_color
 	end
 
+	btn.label:toFront()
+
+
 	function btn:touch( event )
+
 		if event.phase == 'began' then
 
 			 display.getCurrentStage():setFocus( event.target )
@@ -173,9 +160,6 @@ function M:new( opts )
 			if btn.label then
 				btn.label.fill = opts.press_color
 			end
-			if btn.icon then
-				btn.icon.fill = opts.press_color
-			end
 		elseif event.phase == 'ended' then
 			display.getCurrentStage():setFocus( nil )
 			if btn.outline then
@@ -185,12 +169,17 @@ function M:new( opts )
 			if btn.label then
 				btn.label.fill = opts.color
 			end
-			if btn.icon then
-				btn.icon.fill = opts.color
-			end
-			opts.onRelease()
+			opts.onPress()
 		elseif event.phase == 'cancelled' then
 			display.getCurrentStage():setFocus( nil )
+			if btn.outline then
+				btn.outline:setStrokeColor( unpack( opts.outline_color ) )
+				btn.outline.fill = opts.bg_color
+			end
+			if btn.label then
+				btn.label.fill = opts.color
+			end
+
 		end
 		return true
 	end

@@ -16,6 +16,8 @@ local settings = require( 'modules.settings' )
 
 local FileUtils = require( "utilities.file" )
 
+local Btn = require( "ui.btn" )
+
 local Composer = require( "composer" )
 local scene = Composer.newScene()
 
@@ -43,40 +45,29 @@ function scene:create( event )
 		y 			= device.screenHeight * 0.15,
 	})
 
-	
-	ui.back_btn = display.newText({
-		parent 		= group,
-		text 		= "Back",
+
+	ui.back_btn = Btn:new({
+		parent 	= group,
+		label 	= 'Back',
 		font 		= 'assets/fonts/press_play.ttf',
 		fontSize 	= 14,
 		x 			= 40,
 		y 			= device.screenHeight - 40,
+		onPress = function() Composer.gotoScene( 'scenes.main_menu' ) end
 	})
-	ui.back_btn.anchorX = 0
-	function ui.back_btn:touch( e )
-		if e.phase == 'began' then
-			Composer.gotoScene( 'scenes.main_menu' )
-		end
-	end
-	ui.back_btn:addEventListener( 'touch', ui.back_btn )
+	
 
 
-	ui.enter_btn = display.newText({
+	ui.enter_btn = Btn:new({
 		parent 		= group,
-		text 		= "Enter",
+		label 		= "Enter",
 		font 		= 'assets/fonts/press_play.ttf',
 		fontSize 	= 14,
-		x 			= device.screenWidth - 40,
+		x 			= device.screenWidth - 80,
 		y 			= device.screenHeight - 40,
+		anchorX 	= 1,
+		onPress 	= function() Composer.gotoScene( 'scenes.main_menu' ) end
 	})
-	ui.enter_btn.anchorX = 1
-	function ui.enter_btn:touch( e )
-		if e.phase == 'began' then
-			Composer.gotoScene( 'scenes.main_menu' )
-		end
-	end
-	ui.enter_btn:addEventListener( 'touch', ui.enter_btn )
-
 
 	click = audio.loadSound( "assets/audio/sounds/click.wav" )
 

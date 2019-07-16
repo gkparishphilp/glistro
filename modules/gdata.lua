@@ -10,7 +10,7 @@ local sysInfo = system.getInfo
 
 local M = {}
 
-M.cur_mode = 'playnow'
+M.cur_mode = 'micro'
 M.cur_level = 1
 M.game_state = 'paused' -- active, complete, dead
 

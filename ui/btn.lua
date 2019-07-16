@@ -141,7 +141,7 @@ function M:new( opts )
 		btn.outline = display.newRoundedRect( btn, opts.x, opts.y, opts.width, opts.height, opts.outline_radius )
 		
 		if opts.outline > 0 then
-			btn.outline.stroke = {type="image", filename="assets/images/brushes/blur_brush1x4.png"}
+			btn.outline.stroke = {type="image", filename="assets/textures/brushes/blur_brush1x4.png"}
 			btn.outline.strokeWidth = opts.outline
 	
 			-- this can't be stroke= to get antialiased border

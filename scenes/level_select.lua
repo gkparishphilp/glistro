@@ -28,9 +28,25 @@ function scene:create( event )
 		text 		= "Levels",
 		font 		= 'assets/fonts/press_play.ttf',
 		fontSize 	= 28,
-		x 			= centerX,
-		y 			= screenHeight * 0.33,
+		x 			= device.centerX,
+		y 			= device.screenHeight * 0.15,
 	})
+
+	ui.back_btn = display.newText({
+		parent 		= group,
+		text 		= "Back",
+		font 		= 'assets/fonts/press_play.ttf',
+		fontSize 	= 14,
+		x 			= 40,
+		y 			= device.screenHeight - 40,
+	})
+	ui.back_btn.anchorX = 0
+	function ui.back_btn:touch( e )
+		if e.phase == 'began' then
+			Composer.gotoScene( 'scenes.main_menu' )
+		end
+	end
+	ui.back_btn:addEventListener( 'touch', ui.back_btn )
 
 
 	

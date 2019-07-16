@@ -106,8 +106,8 @@ function M:new( args )
 
 	function level:setup()
 		self.data = nil
-		print( "requiring: " .. 'levels.' .. gd.cur_mode .. '_' .. gd.cur_level )
-		self.data = require( 'levels.' .. gd.cur_mode .. '_' .. gd.cur_level )
+		print( "requiring: " .. 'levels.' .. gd.cur_mode .. '.' .. gd.cur_level )
+		self.data = require( 'levels.' .. gd.cur_mode .. '.' .. gd.cur_level )
 
 		self.w = self.data.w
 		self.h = self.data.h

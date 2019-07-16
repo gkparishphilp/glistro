@@ -9,6 +9,8 @@ local scene = Composer.newScene()
 
 local device = require( 'utilities.device' )
 
+local Btn = require( 'ui.btn' )
+
 --------------------------------------------
 
 -- forward declarations and other locals
@@ -32,28 +34,69 @@ function scene:create( event )
 		y 			= device.screenHeight * 0.15,
 	})
 
-	
-	ui.settings_btn = display.newRoundedRect( group, 20, device.screenHeight - 60, 150, 40, 4 )
-	ui.settings_btn.anchorX = 0
-	ui.settings_btn.fill = { 0,0,0,1 }
-	ui.settings_btn:setStrokeColor( 1, 1, 1, 0.5 )
-	ui.settings_btn.strokeWidth = 2
 
-	ui.settings_lbl = display.newText({
+	ui.settings_btn = Btn:new({
 		parent 		= group,
-		text 		= "Settings",
+		outline_radius = 4,
+		outline_color = { 1, 1, 1, 0.5},
+		label 		= "Settings",
+		x 			= 40,
+		y 			= device.screenHeight-60,
+		width 		= 150,
+		height 		= 40,
+		font 		= 'assets/fonts/press_play.ttf',
+		font_size 	= 14,
+		color 		= { 1, 1, 1 },
+		outline 	= 2,
+		anchorX 	= 0
+	})
+
+	ui.settings_btn.anchorX = 0
+	ui.settings_btn.x = 40
+
+	-- ui.settings_btn = display.newRoundedRect( group, 20, device.screenHeight - 60, 150, 40, 4 )
+	-- ui.settings_btn.anchorX = 0
+	-- ui.settings_btn.fill = { 0,0,0,1 }
+	-- ui.settings_btn:setStrokeColor( 1, 1, 1, 0.5 )
+	-- ui.settings_btn.strokeWidth = 2
+
+	-- ui.settings_lbl = display.newText({
+	-- 	parent 		= group,
+	-- 	text 		= "Settings",
+	-- 	font 		= 'assets/fonts/press_play.ttf',
+	-- 	fontSize 	= 14,
+	-- 	x 			= 40,
+	-- 	y 			= device.screenHeight - 60,
+	-- })
+	-- ui.settings_lbl.anchorX = 0
+	-- function ui.settings_btn:touch( e )
+	-- 	if e.phase == 'began' then
+	-- 		Composer.gotoScene( 'scenes.settings' )
+	-- 	end
+	-- end
+	-- ui.settings_btn:addEventListener( 'touch', ui.settings_btn )
+
+
+	ui.levels_btn = display.newRoundedRect( group, device.screenWidth/2, device.screenHeight - 60, 150, 40, 4 )
+	ui.levels_btn.anchorX = 0.5
+	ui.levels_btn.fill = { 0,0,0,1 }
+	ui.levels_btn:setStrokeColor( 1, 1, 1, 0.5 )
+	ui.levels_btn.strokeWidth = 2
+	ui.levels_lbl = display.newText({
+		parent 		= group,
+		text 		= "Levels",
 		font 		= 'assets/fonts/press_play.ttf',
 		fontSize 	= 14,
-		x 			= 40,
+		x 			= device.centerX,
 		y 			= device.screenHeight - 60,
 	})
-	ui.settings_lbl.anchorX = 0
-	function ui.settings_btn:touch( e )
+	function ui.levels_btn:touch( e )
 		if e.phase == 'began' then
-			Composer.gotoScene( 'scenes.settings' )
+			Composer.gotoScene( 'scenes.level_select' )
 		end
 	end
-	ui.settings_btn:addEventListener( 'touch', ui.settings_btn )
+	ui.levels_btn:addEventListener( 'touch', ui.levels_btn )
+
 
 
 	ui.play_btn = display.newRoundedRect( group, device.screenWidth-20, device.screenHeight - 60, 150, 40, 4 )

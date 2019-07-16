@@ -16,6 +16,7 @@ local screenRight = display.screenOriginX + display.actualContentWidth
 local screenWidth = screenRight - screenLeft
 local screenHeight = screenBottom - screenTop
 
+local Clock = require( 'modules.clock' )
 local gd = require( 'modules.gdata' )
 
 local Composer = require( "composer" )

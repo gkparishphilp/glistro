@@ -4,12 +4,18 @@
 -- buttons can include a lable and/or an icon (icons require fontawesome module)
 -- can someday extend to include an image or image-sheet
 
+-- container
+--   - outline
+--   - fill
+-- label
+--   - fill
+-- icon
 
 -- use via: 
 -- Btn = require( "ui.btn" )
--- my_btn = Btn:new({ my_opts })
+-- my_btn = Btn:new({ my_args })
 
--- Here are all available opts so far...
+-- Here are all available args so far...
 
 -- onPress 		= function to call when button is pressed
 -- x 				= x coordinate for btn group
@@ -35,14 +41,14 @@
 ---------------------------------------------------------------------------------
 -- "Globals"
 ---------------------------------------------------------------------------------
-local device = require 'utilities.device'
+local device = require( 'utilities.device' )
 local Debug = require( 'utilities.debug' )
 
 
 -- Table to hold everything
 local M = {}
 
--- Default opts
+-- Default args
 M.defaults = {
 	font 			= 'Helvetica',
 	font_size 		= 12,
@@ -59,89 +65,89 @@ M.defaults = {
 }
 
 -- Create an instance
-function M:new( opts )
-	if opts == nil then opts = M.defaults end
+function M:new( args )
+	if args == nil then args = M.defaults end
 
 
-	-- passing in a theme sets font and colors by default (opts should over-ride)
+	-- passing in a theme sets font and colors by default (args should over-ride)
 	local theme = nil
-	if opts.theme_name then
-		theme = require( 'ui.themes.' .. opts.theme_name )
-	elseif opts.theme then
-		theme = opts.theme
+	if args.theme_name then
+		theme = require( 'ui.themes.' .. args.theme_name )
+	elseif args.theme then
+		theme = args.theme
 	end
 
 
 	if theme then
-		opts.font = opts.font or theme.font
+		args.font = args.font or theme.font
 
-		opts.outline = opts.outline or theme.btn_outline
+		args.outline = args.outline or theme.btn_outline
 
-		opts.color = opts.color or theme.colors.font
-		opts.press_color = opts.press_color or theme.colors.font_press
+		args.color = args.color or theme.colors.font
+		args.press_color = args.press_color or theme.colors.font_press
 
-		opts.bg_color = opts.bg_color or theme.colors.btn_bg
-		opts.bg_press_color = opts.bg_press_color or theme.colors.btn_bg_press
+		args.bg_color = args.bg_color or theme.colors.btn_bg
+		args.bg_press_color = args.bg_press_color or theme.colors.btn_bg_press
 
-		opts.outline_color = opts.outline_color or theme.colors.btn_outline
-		opts.outline_press_color = opts.outline_press_color or theme.colors.btn_outline_press
+		args.outline_color = args.outline_color or theme.colors.btn_outline
+		args.outline_press_color = args.outline_press_color or theme.colors.btn_outline_press
 	end
 	
 
-	-- fill in any missing opts from module defaults
+	-- fill in any missing args from module defaults
 	for key, value in pairs( M.defaults ) do
-		opts[key] = opts[key] or M.defaults[key]
+		args[key] = args[key] or M.defaults[key]
 	end
 
-	-- print( "btn opts: " )
-	-- Debug.print_table( opts )
+	-- print( "btn args: " )
+	-- Debug.print_table( args )
 	
 
 	local btn = display.newGroup()
 	btn.anchorChildren = true 
-	btn.anchorX = opts.anchorX
-	btn.anchorY = opts.anchorY
-	btn.x = opts.x
-	btn.y = opts.y
+	btn.anchorX = args.anchorX
+	btn.anchorY = args.anchorY
+	btn.x = args.x
+	btn.y = args.y
 
-	if opts.parent then
-		opts.parent:insert( btn )
+	if args.parent then
+		args.parent:insert( btn )
 	end
 
 	-- can position the label or defaults to button center
-	opts.label_x = opts.label_x or opts.x
-	opts.label_y = opts.label_y or opts.y
+	args.label_x = args.label_x or args.x
+	args.label_y = args.label_y or args.y
 
 
-	if opts.label then
-		btn.label = display.newText( btn, opts.label, opts.label_x, opts.label_y, opts.font, opts.font_size )
-		btn.label.fill =  opts.color
+	if args.label then
+		btn.label = display.newText( btn, args.label, args.label_x, args.label_y, args.font, args.font_size )
+		btn.label.fill =  args.color
 	end
 
-	opts.width = opts.width or btn.label.contentWidth + opts.font_size*2
-	opts.height = opts.height or btn.label.contentHeight + opts.font_size*2
+	args.width = args.width or btn.label.contentWidth + args.font_size*2
+	args.height = args.height or btn.label.contentHeight + args.font_size*2
 
 
 	-- can set radius ( 0 for square, max of 1/2 height for perfectly round )
-	opts.outline_radius = opts.outline_radius or opts.height / 2
+	args.outline_radius = args.outline_radius or args.height / 2
 
 
 	-- outline color defaults to primary color
-	opts.press_color = opts.press_color or opts.color
-	opts.outline_color = opts.outline_color or opts.color
-	opts.outline_press_color = opts.outline_press_color or opts.press_color
+	args.press_color = args.press_color or args.color
+	args.outline_color = args.outline_color or args.color
+	args.outline_press_color = args.outline_press_color or args.press_color
 	
 
-	if opts.outline >= 0 then
-		btn.outline = display.newRoundedRect( btn, opts.x, opts.y, opts.width, opts.height, opts.outline_radius )
+	if args.outline >= 0 then
+		btn.outline = display.newRoundedRect( btn, args.x, args.y, args.width, args.height, args.outline_radius )
 		
 		btn.outline.stroke = {type="image", filename="assets/textures/brushes/blur_brush1x4.png"}
-		btn.outline.strokeWidth = opts.outline
+		btn.outline.strokeWidth = args.outline
 
 		-- this can't be stroke= to get antialiased border
-		btn.outline:setStrokeColor( unpack(opts.outline_color ) )
+		btn.outline:setStrokeColor( unpack(args.outline_color ) )
 
-		btn.outline.fill = opts.bg_color
+		btn.outline.fill = args.bg_color
 	end
 
 	btn.label:toFront()
@@ -154,30 +160,30 @@ function M:new( opts )
 			 display.getCurrentStage():setFocus( event.target )
 
 			if btn.outline then
-				btn.outline:setStrokeColor( unpack( opts.outline_press_color ) )
-				btn.outline.fill = opts.bg_press_color
+				btn.outline:setStrokeColor( unpack( args.outline_press_color ) )
+				btn.outline.fill = args.bg_press_color
 			end
 			if btn.label then
-				btn.label.fill = opts.press_color
+				btn.label.fill = args.press_color
 			end
 		elseif event.phase == 'ended' then
 			display.getCurrentStage():setFocus( nil )
 			if btn.outline then
-				btn.outline:setStrokeColor( unpack( opts.outline_color ) )
-				btn.outline.fill = opts.bg_color
+				btn.outline:setStrokeColor( unpack( args.outline_color ) )
+				btn.outline.fill = args.bg_color
 			end
 			if btn.label then
-				btn.label.fill = opts.color
+				btn.label.fill = args.color
 			end
-			opts.onPress()
+			args.onPress()
 		elseif event.phase == 'cancelled' then
 			display.getCurrentStage():setFocus( nil )
 			if btn.outline then
-				btn.outline:setStrokeColor( unpack( opts.outline_color ) )
-				btn.outline.fill = opts.bg_color
+				btn.outline:setStrokeColor( unpack( args.outline_color ) )
+				btn.outline.fill = args.bg_color
 			end
 			if btn.label then
-				btn.label.fill = opts.color
+				btn.label.fill = args.color
 			end
 
 		end
